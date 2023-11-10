@@ -1,0 +1,114 @@
+{
+  "name": "kubernetes_unexpected_image_pulls_incident",
+  "description": "The Unexpected Image Pulls Incident refers to an alert triggered by unexpected pulls of container images, which can indicate a compromise in the supply chain. This type of incident can occur when a container image is downloaded from an untrusted or malicious source, or when a legitimate image has been tampered with and modified to include malicious code. Such incidents can pose a serious security risk, as they can allow attackers to gain unauthorized access to systems and steal sensitive data or compromise system integrity. Prompt detection and response to this type of incident is critical to prevent further compromise and protect the security of the system.",
+  "params": [
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    },
+    {
+      "name": "DEPLOYMENT",
+      "value": ""
+    },
+    {
+      "name": "POD_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Kubernetes - Unexpected Image Pulls Incident\nThe Unexpected Image Pulls Incident refers to an alert triggered by unexpected pulls of container images, which can indicate a compromise in the supply chain. This type of incident can occur when a container image is downloaded from an untrusted or malicious source, or when a legitimate image has been tampered with and modified to include malicious code. Such incidents can pose a serious security risk, as they can allow attackers to gain unauthorized access to systems and steal sensitive data or compromise system integrity. Prompt detection and response to this type of incident is critical to prevent further compromise and protect the security of the system."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## List all pods in the cluster"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl get pods --all-namespaces`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the logs of a specific pod"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl logs ${POD_NAME} -n ${NAMESPACE}`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check which image a pod is using"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl describe pod ${POD_NAME} -n ${NAMESPACE} | grep -i image`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if there are any image pull errors in the events for a pod"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl describe pod ${POD_NAME} -n ${NAMESPACE} | grep -i error`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if there are any image pull errors in the events for the entire namespace"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl describe namespace ${NAMESPACE} | grep -i error`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if there are any image pull errors in the events for the entire cluster"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl get events --sort-by='.metadata.creationTimestamp' | grep -i error`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Remove the compromised container images ."
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | random=1 | limit=1 | invoke_remove_deployment_and_image($NAMESPACE, $DEPLOYMENT)"
+    }
+  ]
+}
